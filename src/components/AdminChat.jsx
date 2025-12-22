@@ -74,6 +74,24 @@ function AdminChat() {
       try {
         setIsLoading(true);
         const response = await apiFetch('/api/chat/all');
+        
+        // Check if response is ok before parsing JSON
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error loading chats:', response.status, errorText);
+          toast.error(`Failed to load chats: ${response.status} ${response.statusText}`);
+          return;
+        }
+
+        // Check Content-Type to ensure it's JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await response.text();
+          console.error('Invalid response type:', contentType, text);
+          toast.error('Server returned invalid response format');
+          return;
+        }
+
         const data = await response.json();
 
         if (data.success) {
@@ -102,10 +120,17 @@ function AdminChat() {
       if (selectedChat.unreadCount?.admin > 0) {
         const markAsRead = async () => {
           try {
-            await apiFetch(`/api/chat/${selectedChat._id}/read`, {
+            const response = await apiFetch(`/api/chat/${selectedChat._id}/read`, {
               method: 'PUT',
               body: JSON.stringify({ userType: 'admin' })
             });
+            
+            // Check if response is ok
+            if (!response.ok) {
+              console.error('Error marking messages as read:', response.status, response.statusText);
+              return;
+            }
+
             // Update local state
             setChats(prev => prev.map(chat => 
               chat._id === selectedChat._id 
@@ -134,12 +159,18 @@ function AdminChat() {
         // Try to fetch user profile first
         try {
           const response = await apiFetch(`/api/users/profile/${selectedChat.userId}`);
-          const data = await response.json();
           
-          if (data.success && data.user) {
-            setSelectedUserDetails(data.user);
-            setLoadingUserDetails(false);
-            return;
+          if (response.ok) {
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+              const data = await response.json();
+              
+              if (data.success && data.user) {
+                setSelectedUserDetails(data.user);
+                setLoadingUserDetails(false);
+                return;
+              }
+            }
           }
         } catch (error) {
           console.log('User profile endpoint failed, trying admin users endpoint...');
@@ -147,6 +178,20 @@ function AdminChat() {
 
         // Fallback: fetch all users and find the matching one
         const response = await apiFetch('/api/admin/users');
+        
+        if (!response.ok) {
+          console.error('Error fetching users:', response.status, response.statusText);
+          setSelectedUserDetails(null);
+          return;
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error('Invalid response type when fetching users:', contentType);
+          setSelectedUserDetails(null);
+          return;
+        }
+
         const data = await response.json();
         
         if (data.success && data.data) {
