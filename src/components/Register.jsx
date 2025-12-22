@@ -101,6 +101,20 @@ function Register() {
         })
       });
 
+      // Check if response is ok before parsing JSON
+      if (!response.ok) {
+        let errorMessage = 'Registration failed. Please try again.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          // If response is not JSON, use status text
+          errorMessage = response.statusText || errorMessage;
+        }
+        toast.error(errorMessage);
+        return;
+      }
+
       const data = await response.json();
 
       if (data.success) {
@@ -111,7 +125,14 @@ function Register() {
       }
     } catch (error) {
       console.error('Registration error:', error);
-      toast.error('Registration failed. Please try again.');
+      // Provide more specific error messages
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        toast.error('Unable to connect to server. Please ensure the backend server is running.');
+      } else if (error.message && error.message.includes('VITE_API_URL')) {
+        toast.error('API configuration error. Please check your environment variables.');
+      } else {
+        toast.error('Registration failed. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

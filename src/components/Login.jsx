@@ -79,6 +79,19 @@ function Login() {
           })
         });
 
+        // Check if response is ok before parsing JSON
+        if (!response.ok) {
+          let errorMessage = 'Admin login failed. Please try again.';
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorMessage;
+          } catch (e) {
+            errorMessage = response.statusText || errorMessage;
+          }
+          toast.error(errorMessage);
+          return;
+        }
+
         const data = await response.json();
 
         if (data.success) {
@@ -102,6 +115,20 @@ function Login() {
         })
       });
 
+      // Check if response is ok before parsing JSON
+      if (!response.ok) {
+        let errorMessage = 'Login failed. Please check your credentials.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          // If response is not JSON, use status text
+          errorMessage = response.statusText || errorMessage;
+        }
+        toast.error(errorMessage);
+        return;
+      }
+
       const data = await response.json();
 
       if (data.success) {
@@ -120,7 +147,14 @@ function Login() {
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Login failed. Please check your credentials.');
+      // Provide more specific error messages
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        toast.error('Unable to connect to server. Please ensure the backend server is running.');
+      } else if (error.message && error.message.includes('VITE_API_URL')) {
+        toast.error('API configuration error. Please check your environment variables.');
+      } else {
+        toast.error('Login failed. Please check your credentials.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -132,6 +166,19 @@ function Login() {
         method: 'POST',
         body: JSON.stringify({ accessToken })
       });
+
+      // Check if response is ok before parsing JSON
+      if (!response.ok) {
+        let errorMessage = 'Google sign-in failed. Please try again.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = response.statusText || errorMessage;
+        }
+        toast.error(errorMessage);
+        return false;
+      }
 
       const data = await response.json();
 
@@ -151,7 +198,14 @@ function Login() {
       return false;
     } catch (error) {
       console.error('Google sign-in error:', error);
-      toast.error('Google sign-in failed. Please try again.');
+      // Provide more specific error messages
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        toast.error('Unable to connect to server. Please ensure the backend server is running.');
+      } else if (error.message && error.message.includes('VITE_API_URL')) {
+        toast.error('API configuration error. Please check your environment variables.');
+      } else {
+        toast.error('Google sign-in failed. Please try again.');
+      }
       return false;
     }
   };

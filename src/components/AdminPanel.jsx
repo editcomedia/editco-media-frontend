@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Navbar from './Navbar';
 import BlurText from './BlurText';
+import AdminChat from './AdminChat';
 
 function AdminPanel() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ function AdminPanel() {
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
-  const [activeTab, setActiveTab] = useState('submissions'); // 'submissions', 'users', 'loginHistory'
+  const [activeTab, setActiveTab] = useState('submissions'); // 'submissions', 'users', 'loginHistory', 'chats'
 
   // Check if admin is logged in
   useEffect(() => {
@@ -39,6 +40,7 @@ function AdminPanel() {
     } else if (activeTab === 'loginHistory') {
       await fetchLoginHistory();
     }
+    // Chats tab doesn't need initial fetch - AdminChat component handles it
   };
 
   const fetchSubmissions = async () => {
@@ -238,6 +240,7 @@ function AdminPanel() {
               {activeTab === 'submissions' && 'Contact Form Submissions Management'}
               {activeTab === 'users' && 'User Management'}
               {activeTab === 'loginHistory' && 'Login History'}
+              {activeTab === 'chats' && 'User Chat Management'}
             </p>
           </div>
           <div className="flex items-center gap-4 md:gap-6 flex-wrap">
@@ -305,6 +308,22 @@ function AdminPanel() {
               activeTab === 'loginHistory' ? 'h-full bg-[#ffd600]' : 'bg-gradient-to-t from-[#ffd600] to-[#fff9be] group-hover:h-full'
             }`}></span>
             <span className="relative z-10">Login History</span>
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('chats');
+              setError('');
+            }}
+            className={`relative px-6 py-3 text-[14px] md:text-[16px] border rounded-xl overflow-hidden group transition-colors duration-200 ${
+              activeTab === 'chats' 
+                ? 'text-black border-[#ffd600] bg-[#ffd600]' 
+                : 'text-white border-white/30 hover:text-black'
+            }`}
+          >
+            <span className={`absolute inset-x-0 bottom-0 h-0 transition-all duration-500 ease-in-out ${
+              activeTab === 'chats' ? 'h-full bg-[#ffd600]' : 'bg-gradient-to-t from-[#ffd600] to-[#fff9be] group-hover:h-full'
+            }`}></span>
+            <span className="relative z-10">Chats</span>
           </button>
         </div>
 
@@ -664,6 +683,11 @@ function AdminPanel() {
               </div>
             )}
           </div>
+        )}
+
+        {/* Chats Tab */}
+        {activeTab === 'chats' && (
+          <AdminChat />
         )}
       </div>
       </div>

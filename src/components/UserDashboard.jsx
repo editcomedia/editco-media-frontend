@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import BlurText from './BlurText';
+import Chat from './Chat';
+import { apiFetch } from '../config/api.js';
 import { toast } from 'react-toastify';
 
 function UserDashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -37,6 +41,28 @@ function UserDashboard() {
       navigate('/login');
     }
   }, [navigate]);
+
+  // Fetch unread count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (!user?.id) return;
+      try {
+        const response = await apiFetch(`/api/chat/unread/${user.id}?userType=user`);
+        const data = await response.json();
+        if (data.success) {
+          setUnreadCount(data.unreadCount || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching unread count:', error);
+      }
+    };
+
+    if (user?.id) {
+      fetchUnreadCount();
+      const interval = setInterval(fetchUnreadCount, 30000); // Check every 30 seconds
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -315,6 +341,23 @@ function UserDashboard() {
                   </div>
                 </button>
                 <button
+                  onClick={() => setShowChat(true)}
+                  className="relative p-6 text-left border border-white/20 rounded-xl overflow-hidden group hover:border-[#ffd600]/50 transition-all duration-200"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#ffd600]/0 to-[#ffd600]/0 group-hover:from-[#ffd600]/5 group-hover:to-[#ffd600]/10 transition-all duration-300"></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-white text-[16px] md:text-[18px] font-medium">Chat with Team</h4>
+                      {unreadCount > 0 && (
+                        <span className="bg-[#ffd600] text-black text-xs font-bold px-2 py-1 rounded-full">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-white/60 text-[12px] md:text-[14px]">Get instant support</p>
+                  </div>
+                </button>
+                <button
                   onClick={() => navigate('/')}
                   className="relative p-6 text-left border border-white/20 rounded-xl overflow-hidden group hover:border-[#ffd600]/50 transition-all duration-200"
                 >
@@ -329,6 +372,16 @@ function UserDashboard() {
           </div>
         </div>
       </div>
+      
+      {/* Chat Component */}
+      {showChat && user && (
+        <Chat
+          userId={user.id}
+          userName={`${user.firstName} ${user.lastName}`}
+          userEmail={user.email}
+          onClose={() => setShowChat(false)}
+        />
+      )}
     </div>
   );
 }

@@ -1,24 +1,94 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import ContactOptionsPopup from './ContactOptionsPopup';
 import CalPopup from './CalPopup';
+import Chat from './Chat';
 import './CallButton.css';
 
 const CallButton = () => {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isContactPopupOpen, setIsContactPopupOpen] = useState(false);
+  const [isCalPopupOpen, setIsCalPopupOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
 
-  const handleOpenPopup = () => {
-    setIsPopupOpen(true);
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = () => {
+      const userSession = localStorage.getItem('userLoggedIn');
+      const adminSession = localStorage.getItem('adminLoggedIn');
+      const isUserLoggedIn = userSession === 'true' || adminSession === 'true';
+      
+      setIsLoggedIn(isUserLoggedIn);
+
+      if (isUserLoggedIn && userSession === 'true') {
+        try {
+          const session = JSON.parse(localStorage.getItem('userSession'));
+          if (session && session.user) {
+            setUserInfo({
+              userId: session.user._id || session.user.id,
+              userName: session.user.firstName || session.user.username,
+              userEmail: session.user.email
+            });
+          }
+        } catch (error) {
+          console.error('Error parsing user session:', error);
+          setUserInfo(null);
+        }
+      } else {
+        setUserInfo(null);
+      }
+    };
+
+    checkAuth();
+
+    // Listen for storage changes (in case user logs in/out in another tab)
+    const handleStorageChange = () => {
+      checkAuth();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically in case of same-tab login/logout
+    const interval = setInterval(checkAuth, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleOpenContactPopup = () => {
+    setIsContactPopupOpen(true);
   };
 
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
+  const handleCloseContactPopup = () => {
+    setIsContactPopupOpen(false);
+  };
+
+  const handleChatClick = () => {
+    if (isLoggedIn && userInfo) {
+      setIsChatOpen(true);
+    }
+  };
+
+  const handleBookCallClick = () => {
+    setIsCalPopupOpen(true);
+  };
+
+  const handleCloseCalPopup = () => {
+    setIsCalPopupOpen(false);
+  };
+
+  const handleCloseChat = () => {
+    setIsChatOpen(false);
   };
 
   return (
     <>
       <button
-        onClick={handleOpenPopup}
+        onClick={handleOpenContactPopup}
         className="call-button"
-        aria-label="Book a meeting"
+        aria-label="Contact options"
       >
         <svg
           className="call-icon"
@@ -35,7 +105,26 @@ const CallButton = () => {
           />
         </svg>
       </button>
-      <CalPopup isOpen={isPopupOpen} onClose={handleClosePopup} />
+      
+      <ContactOptionsPopup
+        isOpen={isContactPopupOpen}
+        onClose={handleCloseContactPopup}
+        isLoggedIn={isLoggedIn}
+        userInfo={userInfo}
+        onChatClick={handleChatClick}
+        onBookCallClick={handleBookCallClick}
+      />
+      
+      <CalPopup isOpen={isCalPopupOpen} onClose={handleCloseCalPopup} />
+      
+      {isChatOpen && userInfo && (
+        <Chat
+          userId={userInfo.userId}
+          userName={userInfo.userName}
+          userEmail={userInfo.userEmail}
+          onClose={handleCloseChat}
+        />
+      )}
     </>
   );
 };
