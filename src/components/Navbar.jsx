@@ -29,22 +29,21 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 flex items-center justify-between bg-[#1d1d1f] py-4 px-6">
-      <div className="text-white">
+    <nav className="fixed top-0 left-0 w-full z-50 flex items-center justify-between backdrop-blur-md bg-white/30 py-4 px-8 transition-colors duration-500">
+      <div className="text-black">
         <a href="/" className="block">
           <img
             src="https://res.cloudinary.com/dqataciy5/image/upload/v1758274781/Gemini_Generated_Image_87j6z987j6z987j6_kuuycd.jpg"
             alt="editco.media logo"
-            className="h-10 md:h-12 w-auto object-contain rounded hover:opacity-80 transition-opacity duration-200"
+            className="h-10 md:h-12 w-auto object-contain hover:scale-105 transition-transform duration-300"
           />
         </a>
       </div>
       <div className="relative flex items-center gap-8">
-        <div className="hidden md:flex items-center gap-8">
-          <a href="/services" className="text-white hover:text-[#ffc800f3] transition-colors duration-200 text-lg font-normal">Services</a>
-          <a href="/work" className="text-white hover:text-[#ffd600] transition-colors duration-200 text-lg font-normal">Work</a>
-          <a href="/about" className="text-white hover:text-[#ffd600] transition-colors duration-200 text-lg font-normal">About</a>
-          {/* <a href="/blogs" className="text-white hover:text-[#ffd600] transition-colors duration-200 text-lg font-normal">Blog</a> */}
+        <div className="hidden md:flex items-center gap-10">
+          <a href="/services" className="text-black hover:opacity-100 opacity-60 transition-all duration-300 text-base font-medium tracking-tight uppercase">Services</a>
+          <a href="/work" className="text-black hover:opacity-100 opacity-60 transition-all duration-300 text-base font-medium tracking-tight uppercase">Work</a>
+          <a href="/about" className="text-black hover:opacity-100 opacity-60 transition-all duration-300 text-base font-medium tracking-tight uppercase">About</a>
         </div>
         <div className="flex items-center gap-3">
           {/* User Name Display - Clickable, All Screens */}
@@ -66,12 +65,12 @@ const Navbar = () => {
             /* Login Button - Only when not logged in */
             <a href="/login" className="block">
               <button
-                className="relative flex items-center justify-center px-5 h-10 rounded-full text-[14px] font-inherit border border-white/20 overflow-hidden z-[1] group bg-transparent text-white hover:text-black transition-colors duration-200"
+                className="relative flex items-center justify-center px-6 h-10 rounded-full text-[13px] font-semibold border border-black/10 overflow-hidden z-[1] group bg-transparent text-black transition-all duration-300"
               >
                 <span
-                  className="absolute top-0 left-0 h-full w-0 rounded-full bg-gradient-to-r from-[#fff9be] to-[#ffd600] transition-all duration-500 ease-in-out z-[-1] group-hover:w-full"
+                  className="absolute top-0 left-0 h-full w-0 bg-black transition-all duration-500 ease-in-out z-[-1] group-hover:w-full"
                 ></span>
-                Login
+                <span className="group-hover:text-white transition-colors duration-200">Login</span>
               </button>
             </a>
           )}
@@ -79,26 +78,23 @@ const Navbar = () => {
           {/* Connect Button - Desktop Only */}
           <a href="/connect" className="hidden md:block">
             <button
-              className="relative flex items-center justify-center w-32 h-10 rounded-full text-[14px] font-inherit border border-white/10 overflow-hidden z-[1] group bg-[#ffd600]"
+              className="relative flex items-center justify-center w-36 h-10 rounded-full text-[13px] font-semibold overflow-hidden z-[1] group bg-black text-white hover:bg-black/90 transition-all duration-300 shadow-lg shadow-black/10"
             >
-              <span
-                className="absolute top-0 left-0 h-full w-0 rounded-full bg-gradient-to-r from-[#fff9be] to-[#ffd600] transition-all duration-500 ease-in-out z-[-1] group-hover:w-full"
-              ></span>
-              Connect
+              Get in Touch
             </button>
           </a>
         </div>
         
         {/* Hamburger */}
         <button
-          className="md:hidden inline-flex flex-col justify-center items-center w-10 h-10 border border-white/15 rounded-lg text-white"
+          className="md:hidden inline-flex flex-col justify-center items-center w-10 h-10 border border-black/15 rounded-full text-black"
           aria-label="Toggle menu"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
-          <span className={`block h-[2px] w-5 bg-white transition-transform ${open ? 'translate-y-[6px] rotate-45' : ''}`}></span>
-          <span className={`block h-[2px] w-5 bg-white my-[5px] transition-opacity ${open ? 'opacity-0' : 'opacity-100'}`}></span>
-          <span className={`block h-[2px] w-5 bg-white transition-transform ${open ? '-translate-y-[6px] -rotate-45' : ''}`}></span>
+          <span className={`block h-[2px] w-5 bg-black transition-transform ${open ? 'translate-y-[6px] rotate-45' : ''}`}></span>
+          <span className={`block h-[2px] w-5 bg-black my-[5px] transition-opacity ${open ? 'opacity-0' : 'opacity-100'}`}></span>
+          <span className={`block h-[2px] w-5 bg-black transition-transform ${open ? '-translate-y-[6px] -rotate-45' : ''}`}></span>
         </button>
         {open && (
           <div className="md:hidden absolute right-0 top-full mt-2 w-64 rounded-xl border border-white/10 bg-[#1d1d1f]/95 backdrop-blur-sm shadow-lg overflow-hidden">

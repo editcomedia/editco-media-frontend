@@ -1,7 +1,6 @@
 import React from 'react'
 import Navbar from './Navbar'
-import Background from './Background'
-import HeroText from './HeroText'
+import Hero from './Hero' // The new 3D cinematic hero
 import Services from './Services'
 import About from './About'
 import Work from './Work'
@@ -16,8 +15,7 @@ function Home() {
   return (
     <div>
       <Navbar />
-      <Background />
-      <HeroText />
+      <Hero />
       <Services />
       <Work />
       <About />
