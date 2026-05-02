@@ -9,10 +9,10 @@ function Hero() {
         loop
         muted
         playsInline
+        preload="auto"
         className="absolute inset-0 w-full h-full object-cover z-0 opacity-80"
-      >
-        <source src="https://res.cloudinary.com/dxeoibunj/video/upload/v1776489622/Timeline_1_xhvbls_aecyri.mov" type="video/mp4" />
-      </video>
+        src="https://res.cloudinary.com/dxeoibunj/video/upload/v1776489622/Timeline_1_xhvbls_aecyri.mov"
+      />
 
       {/* Branding Overlay */}
       <div className="relative z-20 flex flex-col items-center px-4 max-w-5xl mt-20">
